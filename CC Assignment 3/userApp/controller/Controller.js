@@ -74,6 +74,7 @@ exports.delete_user = function (req, res) {
 
 
 exports.list_users = function (req,res) {
+  userResp = []
   User.find({})
     .then(user => {
       console.log(user);
@@ -82,7 +83,12 @@ exports.list_users = function (req,res) {
         res.status(204).send({});
       }
       else{
-        res.status(200).json(user);
+	for(var index = 0;index<user.length;++index){
+          var u = user[index];
+          console.log(u.username);
+          userResp.push(u.username);
+        }
+        res.status(200).json(userResp);
       }
     })
     .catch(err => {
