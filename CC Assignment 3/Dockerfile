@@ -14,6 +14,7 @@ RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositor
   && rm -rf /tmp/* /var/cache/apk/*
 
 RUN apk add --update nodejs nodejs-npm && npm install
+
 # Make /data/db directory
 RUN mkdir -p /data/db && \
     chown -R mongodb /data/db
