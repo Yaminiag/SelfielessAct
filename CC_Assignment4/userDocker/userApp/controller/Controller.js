@@ -8,6 +8,9 @@ var mongoose = require('mongoose'),
 
 exports.create_user = function (req, res) {
 
+  Req.create({count : 1});
+  console.log("Request");
+
   var new_user = new User({
   username : req.body.username,
   password : req.body.password
@@ -41,7 +44,7 @@ exports.create_user = function (req, res) {
         console.log("Bad Request");
         res.status(400).send({});
       })
-	}
+  }
 };
   
 exports.delete_user = function (req, res) {
@@ -50,6 +53,9 @@ exports.delete_user = function (req, res) {
     res.status(200).send();
   }
   else if(req.method == 'DELETE'){
+  Req.create({count : 1});
+  console.log("Request");
+
   User.find({username : req.params.username})
     .then(data => {
       if(data.length == 0){
@@ -69,12 +75,18 @@ exports.delete_user = function (req, res) {
     })    
   }
   else{
+    Req.create({count : 1});
+    console.log("Request");
     res.status(405).send();
   }
 };
 
 
 exports.list_users = function (req,res) {
+  Req.create({count : 1});
+  console.log("Request");
+
+  userResp = []
   User.find({})
     .then(user => {
       console.log(user);
@@ -83,7 +95,12 @@ exports.list_users = function (req,res) {
         res.status(204).send({});
       }
       else{
-        res.status(200).json(user);
+  for(var index = 0;index<user.length;++index){
+          var u = user[index];
+          console.log(u.username);
+          userResp.push(u.username);
+        }
+        res.status(200).json(userResp);
       }
     })
     .catch(err => {
@@ -93,6 +110,9 @@ exports.list_users = function (req,res) {
 };
 
 exports.error = function (req,res) {
+  Req.create({count : 1});
+  console.log("Request");
+  
   console.log("Method Not Allowed");
   res.status(405).send({});
 };

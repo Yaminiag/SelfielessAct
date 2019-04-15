@@ -6,6 +6,7 @@ var mongoose = require('mongoose'),
   crypto = require('crypto'),
   base64Img = require('base64-img'),
   date = require('date-and-time'),
+  request = require('request'),
   isBase64 = require('is-base64');
 
 
@@ -160,6 +161,16 @@ exports.upload_act = function (req,res) {
   Req.create({count : 1});
   console.log("Request");
 
+  var new_act = new Act({
+          actId : req.body.actId,
+          username : req.body.username,
+          caption : req.body.caption,
+          categoryName : req.body.categoryName,
+          timestamp:req.body.timestamp,
+          upvotes : 0,
+          imgB64 : req.body.imgB64
+        });
+
   var valid = 1;
   if(!req.body){
     res.status(400).send({});
@@ -172,10 +183,8 @@ exports.upload_act = function (req,res) {
   }
   else if(!isBase64(req.body.imgB64)){
     valid = 0;
-    console.log(req.body.imgB64)
     console.log('image');
     res.status(400).send({});
-    res.end();
   }
   else if(!date.isValid(req.body.timestamp,'DD-MM-YYYY:ss-mm-hh'))
   {
@@ -183,63 +192,69 @@ exports.upload_act = function (req,res) {
     console.log("Date");
     res.status(400).send({});
   }
-  var new_act = new Act({
-          actId : req.body.actId,
-          username : req.body.username,
-          caption : req.body.caption,
-          categoryName : req.body.categoryName,
-          timestamp:req.body.timestamp,
-          upvotes : 0,
-          imgB64 : req.body.imgB64
+  else{
+    request.get("http://3.208.117.5:80/api/v1/users", (error, response, body) => {
+    if(error) {
+        return console.log(error);
+    }
+    user = JSON.parse(body);
+    var flag = 0;
+    for(var index = 0;index<user.length;++index){
+      var u = user[index];
+      if(u == req.body.username){
+        flag = 1;
+      }
+    }
+
+    if(flag == 0 || user.length == 0){
+      valid = 0;
+      console.log('no user')
+      res.status(400).send({});
+    }
+    else if(flag == 1){
+      console.log("User exists");
+      Category.find({categoryName : req.body.categoryName})
+        .then(cat => {
+          console.log(cat)
+          if(cat.length == 0)
+          {
+            valid = 0;
+            console.log("Category doesn't exist!")
+            res.status(400).send({});
+          }
+          else{
+            if(valid!==0){
+              new_act.save()
+                .then(act => {
+                  console.log(act)
+                  Category.update({categoryName : req.body.categoryName},{$inc : {actCount:1}})
+                    .then(resp => {
+                      console.log(resp);
+                      if(resp['n'] == 0){
+                        res.status(400).send({});
+                      }
+                      else{
+                        console.log("Act Created!");
+                        res.status(201).send({});
+                      }
+                    })
+                    .catch(errors => {
+                      console.log(errors);
+                    })
+                })
+                .catch(e => {
+                  console.log("Act Id should be unique")
+                  return res.status(400).send({});
+                })
+            }
+          }
         });
-
-  User.find({username : req.body.username})
-    .then(user => {
-        if(user.length == 0){
-          valid = 0;
-          console.log('no user')
-          res.status(400).send({});
-        }
-        else{
-        Category.find({categoryName : req.body.categoryName})
-          .then(cat => {
-            console.log(cat)
-            if(cat.length == 0)
-            {
-              valid = 0;
-              console.log("Category doesn't exist!")
-              res.status(400).send({});
-            }
-            else{
-              if(valid!==0){
-                new_act.save()
-                  .then(act => {
-                    console.log(act)
-                    Category.update({categoryName : req.body.categoryName},{$inc : {actCount:1}})
-                      .then(resp => {
-                        console.log(resp);
-                        if(resp['n'] == 0){
-                          res.status(400).send({});
-                        }
-                        else{
-                          console.log("Act Created!");
-                          res.status(201).send({});
-                        }
-                      })
-                      .catch(errors => {
-                        console.log(errors);
-                      })
-                  })
-                  .catch(e => {
-                    console.log("Act Id should be unique")
-                    return res.status(400).send({});
-                  })
-              }
-            }
-          });
-        }
+      }
+      else{
+        res.status(400).send();
+      }
     });
-
+  } 
 };
 
 
