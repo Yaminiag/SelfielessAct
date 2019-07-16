@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<configuration>
+	<service name="acts">
+		<image>acts</image>
+		<dockerfile></dockerfile>
+		<detach>True</detach>
+		<mapping>8000:3000</mapping>
+		<memory_limit>128</memory_limit>
+		<count>1</count>
+		<alarm>
+			<threshold>20</threshold>
+			<time>120</time>
+		</alarm>
+		<health>/api/v1/_health</health>
+	</service>
+	<databse>
+		<image>mongo</image>
+		<dockerfile></dockerfile>
+		<detach>True</detach>
+		<mapping>27017:27017</mapping>
+	</databse>
+</configuration>

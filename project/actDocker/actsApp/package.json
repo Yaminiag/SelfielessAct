@@ -1,0 +1,29 @@
+{
+  "name": "assignment2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "base64-img": "^1.0.4",
+    "body-parser": "^1.18.3",
+    "date-and-time": "^0.6.3",
+    "docker-container-id": "^1.0.1",
+    "express": "^4.16.4",
+    "express-healthcheck": "^0.1.0",
+    "image-to-base64": "^2.0.1",
+    "is-base64": "^0.1.0",
+    "jquery": "^3.3.1",
+    "js-sha1": "^0.6.0",
+    "mongo-healthcheck": "^2.0.1",
+    "mongoose": "^4.5.8",
+    "morgan": "^1.9.1",
+    "nodemon": "^1.18.9",
+    "os": "^0.1.1",
+    "request": "^2.88.0"
+  }
+}
